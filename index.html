@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en" ng-app="unisus">
+
+<head>
+    <title>Unisus</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap core CSS -->
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css">
+    <link href="css/sticky-footer.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div id="wrap">
+    <div class="container">
+        <header class="bs-docs-nav navbar navbar-static-top">
+            <nav class="navbar navbar-default navbar-fixed-top">
+                <div class="container">
+                    <!-- Brand and toggle get grouped for better mobile display -->
+                    <div class="navbar-header">
+                        <a class="navbar-brand" href="#">UNISUS</a>
+                    </div>
+
+                    <!-- Collect the nav links, forms, and other content for toggling -->
+                    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                        <ul class="nav navbar-nav">
+
+                            <li ui-sref-active="active"><a ui-sref="order">Orders</a></li>
+
+                            <li ui-sref-active="active"><a ui-sref="customer">Customer</a></li>
+
+                            <li ui-sref-active="active"><a ui-sref="products">Product</a></li>
+
+                        </ul>
+
+                        <ul class="nav navbar-nav navbar-right" ng-controller="LoginCtrl">
+                            <li ng-if="!isAuthenticated()"><a class="btn" ng-click="authenticate('facebook')">Login</a>
+                            </li>
+
+                            <li ng-if="isAuthenticated()" class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                                   aria-haspopup="true"
+                                   aria-expanded="false"><span ng-bind="model.name"></span><span
+                                        class="caret"></span></a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="btn" ng-click="logout()">Logout</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div><!-- /.navbar-collapse -->
+
+                </div>
+            </nav>
+        </header>
+        <div class="container bs-docs-container">
+            <ui-view></ui-view>
+        </div>
+    </div>
+</div>
+
+<div id="footer">
+    <div class="container">
+        <p style="padding-top: 16px;">Powered by Unisus</p>
+    </div>
+</div>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
+<script src="js/libs.min.js"></script>
+
+<script src="js/app.min.js"></script>
+
+</body>
+
+</html>

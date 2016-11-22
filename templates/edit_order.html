@@ -1,0 +1,465 @@
+<div class="page-header">
+  <h2>Order Editor</h2>
+</div>
+
+<div class="panel panel-default">
+  <div class="panel-body">
+    <div class="page-header">
+      <h4>Customer Information</h4>
+    </div>
+
+    <div class="row">
+      <h5 class="col-sm-2 text-right"><b>Name</b></h5>
+      <h5 class="col-sm-10">
+        <a ng-bind="order.customer.name" ui-sref="customer_panel({customerId: order.customer.id})"></a>
+      </h5>
+    </div>
+
+    <div class="row">
+      <h5 class="col-sm-2 text-right"><b>Link</b></h5>
+      <h5 class="col-sm-10"><span ng-bind="order.customer.url"></span></h5>
+    </div>
+
+    <div class="row">
+      <h5 class="col-sm-2 text-right"><b>Description</b></h5>
+      <h5 class="col-sm-10"><span ng-bind="order.customer.description"></span></h5>
+    </div>
+
+  </div>
+</div>
+
+<div class="panel panel-default">
+  <div class="panel-body">
+    <div class="page-header">
+      <h4>Order Products</h4>
+    </div>
+
+
+    <table class="table table-hover">
+      <thead>
+      <th class="col-md-1">Product ID</th>
+      <th class="col-md-2">Product Name</th>
+      <th class="col-md-2">Real Price</th>
+      <th class="col-md-2">Discounted Price</th>
+      <th class="col-md-1">Amount</th>
+      <th class="col-md-2">Sum</th>
+      <th class="col-md-1">Action</th>
+      </thead>
+      <tbody>
+      <tr ng-repeat="item in order.orderProducts">
+        <td ng-bind="item.product.id"></td>
+        <td ng-bind="item.product.name"></td>
+        <td ng-bind="utils.formatMoney(item.product.price)"></td>
+        <td ng-bind="utils.formatMoney(item.discountedPrice)"></td>
+        <td ng-bind="item.amount"></td>
+        <td ng-bind="utils.formatMoney(item.amount * item.discountedPrice)"></td>
+        <td>
+          <a class="btn btn-sm"><span class="glyphicon glyphicon-pencil"/></a>
+          <a class="btn btn-sm"><span class="glyphicon glyphicon-trash"/></a>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+
+    <div class="row">
+      <div class="col-md-12 text-right"><a class="btn btn-default" ng-click="showAddOrderProductModal()">Add</a></div>
+    </div>
+
+  </div>
+</div>
+
+<div class="panel panel-default">
+  <div class="panel-body">
+    <div class="page-header">
+      <h4>Receiving Information</h4>
+    </div>
+    <table class="table table-hover">
+      <thead>
+      <th class="col-md-1">Choose</th>
+      <th class="col-md-2">Receiver Name</th>
+      <th class="col-md-2">Phone</th>
+      <th class="col-md-4">Address</th>
+      <th class="col-md-1">Action</th>
+      </thead>
+      <tbody>
+      <tr ng-repeat="info in receiving.infos">
+        <td><input type="radio" ng-model="receiving.selectedInfo" ng-value="info"
+                   ng-change="changing.onShippingChange(receiving.selectedInfo)"/></td>
+        <td ng-bind="info.name"></td>
+        <td ng-bind="info.phone"></td>
+        <td ng-bind="info.address"></td>
+        <td>
+          <a class="btn btn-sm" ng-click="editReceiverInfo(info)"><span class="glyphicon glyphicon-pencil"/></a>
+          <a class="btn btn-sm" ng-click="deleteReceiverInfo(info)"><span class="glyphicon glyphicon-trash"/></a>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+
+    <div class="row">
+      <div class="col-md-12 text-right"><a class="btn btn-default" ng-click="addReceiverInfo()">Add</a></div>
+    </div>
+  </div>
+</div>
+
+<div class="panel panel-default" ng-show="receiving.selectedInfo">
+  <div class="panel-body">
+    <div class="page-header">
+      <h4>Shipping Information</h4>
+    </div>
+
+    <form class="form-horizontal">
+      <div class="form-group">
+        <label class="col-sm-2 control-label">Service Provider</label>
+        <div class="col-sm-4">
+          <div class="input-group">
+            <select class="form-control" ng-model="shipping.selecting.provider.data"
+                    ng-options="provider.name for provider in shipping.providers track by provider.id"
+                    ng-change="changing.onShippingProviderChange(shipping.selecting.provider.data)"></select>
+            <span class="input-group-btn"><a class="btn" ng-click="shipping.showManageProviderModal()"><span
+              class="glyphicon glyphicon-wrench"/> </a></span>
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-sm-2 control-label">Shipping Service Code</label>
+        <div class="col-sm-4">
+          <div class="input-group">
+            <input type="text" class="form-control"
+                   ng-model="order.shippingServiceCode"
+                   ng-change="changing.onShippingServiceCodeChange(order.shippingServiceCode)"/>
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-sm-2 control-label">Service Fee</label>
+        <div class="col-sm-4">
+          <div class="input-group">
+            <input cleave="inputOptions.numeral" type="text" class="form-control"
+                   ng-model="order.shippingFee"
+                   ng-change="changing.onShippingFeeChange(order.shippingFee)">
+            <span class="input-group-addon" id="basic-addon2">đ</span>
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-sm-2 control-label">Shipping date</label>
+        <div class="col-sm-4">
+          <div class="input-group">
+            <input cleave="inputOptions.date" type="text" class="form-control"
+                   placeholder="dd/mm/yyyy"
+                   ng-model="order.shippingDate"
+                   ng-change="changing.onShippingDateChange(order.shippingDate)">
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-sm-2 control-label">Shipping Status</label>
+        <div class="col-sm-4">
+          <div class="input-group">
+            <select class="form-control" ng-model="shipping.selecting.status.data"
+                    ng-options="status.name for status in shipping.statuses track by status.id"
+                    ng-change="changing.onShippingStatusChange(shipping.selecting.status.data)"></select>
+            <span class="input-group-btn"><a class="btn" ng-click="shipping.showManageStatusModal()">
+              <span class="glyphicon glyphicon-wrench"/></a></span>
+          </div>
+
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-sm-2 control-label">COD Received</label>
+        <div class="col-sm-10">
+          <div class="input-group">
+            <div class="checkbox">
+              <label>
+                <input type="checkbox" class="form-control" ng-model="order.codReceived"
+                       ng-change="changing.onCodReceivedChange(order.codReceived)"/>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="panel panel-default">
+  <div class="panel-body">
+    <div class="row">
+      <div class="col-md-2 text-right"><h4>Total Price</h4></div>
+      <div class="col-md-6"><b><h4 ng-bind="utils.formatMoney(calculateTotal())"></h4></b></div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12 text-right">
+    <a class="btn btn-primary" ng-click="changing.saveAllChanged()" ng-class="{disabled:!changing.isChanged()}">Save
+      change</a>
+  </div>
+</div>
+
+
+<!-- Notify New Customer Modal-->
+<div class="modal fade" id="confirmCreateCustomerModal" tabindex="-1" role="dialog"
+     aria-labelledby="confirmCreateCustomerModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="myModalLabel">Customer Not Found</h4>
+      </div>
+      <div class="modal-body">
+        <h5>Oop! This seem that this customer haven't found in our system. Create new one?</h5>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" ng-click="routeToCreateCustomer(checking.url)">Sure, create new
+        </button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">No, I'll check the url again</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Shipping Address Modal-->
+<div class="modal fade" id="addReceivingModal" tabindex="-1" role="dialog"
+     aria-labelledby="addReceivingLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="addReceivingLabel">Add Receiving Information</h4>
+      </div>
+      <div class="modal-body">
+        <form class="form-horizontal">
+          <div class="form-group">
+            <label class="col-sm-2 control-label">Receiver Name</label>
+            <div class="col-sm-10">
+              <input type="text" class="form-control" placeholder="Tên người nhận"
+                     ng-model='receiver.name'>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="inputPrice" class="col-sm-2 control-label">Phone</label>
+            <div class="col-sm-10">
+              <input cleave="inputOptions.phone" type="text" class="form-control" id="inputPrice"
+                     placeholder="Số điện thoại người nhận"
+                     ng-model='receiver.phone'>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="inputDescription" class="col-sm-2 control-label">Address</label>
+            <div class="col-sm-10">
+              <textarea id="inputDescription" class="form-control" rows="3" ng-model='receiver.address'
+                        placeholder="Địa chỉ người nhận"></textarea>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" ng-click="saveReceiverInfo(receiver)">OK
+        </button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add order product modal-->
+<div class="modal fade" id="addOrderProductModal" tabindex="-1" role="dialog"
+     aria-labelledby="addReceivingLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Add Order Product</h4>
+      </div>
+      <div class="modal-body">
+        <form class="form-horizontal">
+
+          <div class="form-group">
+            <label class="col-md-4 control-label">Product</label>
+            <div class="col-md-6">
+              <div class="input-group">
+                <select class="form-control" ng-model="modal.orderProduct.product"
+                        ng-options="product.name for product in products track by product.id"
+                        ng-change="onChange(modal.orderProduct.product)">
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="col-md-4 text-right"><b>Price</b></div>
+            <div class="col-md-6" ng-bind="utils.formatMoney(modal.orderProduct.product.price)"></div>
+          </div>
+
+          <div class="form-group">
+            <label class="col-md-4 control-label">Discounted Price</label>
+            <div class="col-md-6">
+              <div class="input-group">
+                <input cleave="inputOptions.numeral"
+                       type="text" class="form-control"
+                       ng-model="modal.orderProduct.discountedPrice">
+                <span class="input-group-addon">đ</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="col-md-4 control-label">Amount</label>
+            <div class="col-md-6">
+              <div class="input-group">
+                <input type="number" class="form-control" ng-model="modal.orderProduct.amount">
+              </div>
+            </div>
+          </div>
+
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary"
+                ng-click="addOrderProduct(modal.orderProduct.product.id, modal.orderProduct.discountedPrice, modal.orderProduct.amount)">
+          OK
+        </button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Manage Shipping Provider Modal-->
+<div class="modal fade" id="manageShippingProviderModal" tabindex="-1" role="dialog"
+     aria-labelledby="manageShippingProviderModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Shipping Provider</h4>
+      </div>
+      <div class="modal-body">
+        <table class="table table-hover">
+          <thead>
+          <th class="col-md-4">Name</th>
+          <th class="col-md-6">Website</th>
+          <th></th>
+          </thead>
+          <tbody>
+          <tr ng-repeat="provider in shipping.providers">
+            <td>
+              <span ng-bind="provider.name" ng-show="!shipping.editing.provider.isEditing(provider)"></span>
+              <input type="text" ng-model="shipping.editing.provider.data.name"
+                     ng-show="shipping.editing.provider.isEditing(provider)">
+            </td>
+            <td>
+              <span ng-bind="provider.website" ng-show="!shipping.editing.provider.isEditing(provider)"></span>
+              <input type="text" ng-model="shipping.editing.provider.data.website"
+                     ng-show="shipping.editing.provider.isEditing(provider)">
+            </td>
+            <td>
+              <div ng-show="!shipping.editing.provider.isEditing(provider)">
+                <a class="btn btn-sm" ng-click="shipping.editing.provider.setEditing(provider)"
+                   ng-class="{disabled: shipping.editing.provider.deleting}">
+                  <span class="glyphicon glyphicon-pencil"/></a>
+                <a class="btn btn-sm" ng-click="shipping.editing.provider.deleteProvider(provider)"
+                   ng-class="{disabled: shipping.editing.provider.deleting}">
+                  <span class="glyphicon glyphicon-trash"/></a>
+              </div>
+              <div ng-show="shipping.editing.provider.isEditing(provider)">
+                <a class="btn btn-sm" ng-click="shipping.editing.provider.save()"
+                   ng-class="{disabled: shipping.editing.provider.saving}">
+                  <span class="glyphicon glyphicon-ok"/></a>
+                <a class="btn btn-sm" ng-click="shipping.editing.provider.cancelEditing()"
+                   ng-class="{disabled: shipping.editing.provider.saving}">
+                  <span class="glyphicon glyphicon-remove"/></a>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <div
+                ng-class="{'has-error': shipping.adding.provider.verifying.name.error, 'has-success': shipping.adding.provider.verifying.name.success}">
+                <input type="text" class="form-control"
+                       ng-model="shipping.adding.provider.data.name"
+                       ng-change="shipping.adding.provider.verifyName()">
+              </div>
+            </td>
+            <td><input type="text" class="form-control" ng-model="shipping.adding.provider.data.website"></td>
+            <td>
+              <button class="btn btn-default"
+                      ng-class="{disabled: shipping.adding.provider.processing}"
+                      ng-click="shipping.adding.provider.addProvider()">Add
+              </button>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Manage Shipping Status Modal-->
+<div class="modal fade" id="manageShippingStatusModal" tabindex="-1" role="dialog"
+     aria-labelledby="manageShippingStatusModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Shipping Status</h4>
+      </div>
+      <div class="modal-body">
+        <table class="table table-hover">
+          <thead>
+          <th class="col-md-4">Name</th>
+          <th></th>
+          </thead>
+          <tbody>
+          <tr ng-repeat="status in shipping.statuses">
+            <td>
+              <span ng-bind="status.name" ng-show="!shipping.editing.status.isEditing(status)"></span>
+              <input type="text" ng-model="shipping.editing.status.data.name"
+                     ng-show="shipping.editing.status.isEditing(status)">
+            </td>
+            <td>
+              <div ng-show="!shipping.editing.status.isEditing(status)">
+                <a class="btn btn-sm" ng-click="shipping.editing.status.setEditing(status)"
+                   ng-class="{disabled: shipping.editing.status.deleting}">
+                  <span class="glyphicon glyphicon-pencil"/></a>
+                <a class="btn btn-sm" ng-click="shipping.editing.status.deleteStatus(status)"
+                   ng-class="{disabled: shipping.editing.status.deleting}">
+                  <span class="glyphicon glyphicon-trash"/></a>
+              </div>
+              <div ng-show="shipping.editing.status.isEditing(status)">
+                <a class="btn btn-sm" ng-click="shipping.editing.status.save()"
+                   ng-class="{disabled: shipping.editing.status.saving}">
+                  <span class="glyphicon glyphicon-ok"/></a>
+                <a class="btn btn-sm" ng-click="shipping.editing.status.cancelEditing()"
+                   ng-class="{disabled: shipping.editing.status.saving}">
+                  <span class="glyphicon glyphicon-remove"/></a>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <div
+                ng-class="{'has-error': shipping.adding.status.verifying.name.error, 'has-success': shipping.adding.status.verifying.name.success}">
+                <input type="text" class="form-control"
+                       ng-model="shipping.adding.status.data.name"
+                       ng-change="shipping.adding.status.verifyName()">
+              </div>
+            </td>
+            <td>
+              <a class="btn btn-default" ng-class="{disabled: shipping.adding.status.processing}"
+                 ng-click="shipping.adding.status.addStatus()">Add
+              </a>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>

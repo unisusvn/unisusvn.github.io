@@ -1,0 +1,36 @@
+<div class="col-md-12 page-header">
+  <div class="col-md-6"><h2>Orders </h2></div>
+  <div class="col-md-2 text-right">
+    <button class="btn btn-primary" ui-sref="create_order"><span class="glyphicon glyphicon-plus"/> New</button>
+  </div>
+  <div class="input-group col-md-4">
+    <input type="text" class="form-control" placeholder="Search for...">
+    <div class="input-group-btn">
+      <a class="btn btn-default" type="button"><span class=" glyphicon glyphicon-search"/> </a>
+    </div>
+  </div><!-- /input-group -->
+</div>
+
+<table class="table table-hover">
+  <thead>
+  <th class="col-md-1">ID</th>
+  <th class="col-md-2">Customer</th>
+  <th class="col-md-1">Total Price</th>
+  <th class="col-md-1">Ordered at</th>
+  <th class="col-md-2">Shipping At</th>
+  <th class="col-md-1">COD received</th>
+  <th class="col-md-1">Status</th>
+  </thead>
+
+  <tbody>
+  <tr ng-repeat="order in orders" ui-sref="edit_order({orderId: order.id})">
+    <td><a ui-sref="edit_order({orderId: order.id})" ng-bind='order.id'></a></td>
+    <td ng-bind="order.customer.name"></td>
+    <td ng-bind="utils.formatMoney(calculateTotal(order))"></td>
+    <td ng-bind="utils.momentFromNow(order.created)"></td>
+    <td ng-bind="utils.simpleDateFormat(order.shippingAt)"></td>
+    <td ng-bind="order.codReceived"></td>
+    <td ng-bind="order.shippingStatus.name"></td>
+  </tr>
+  </tbody>
+</table>

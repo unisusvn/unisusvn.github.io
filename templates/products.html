@@ -1,0 +1,128 @@
+<div class="col-md-12 page-header">
+  <div class="col-md-6"><h2>Products </h2></div>
+  <div class="col-md-2 text-right">
+    <button class="btn btn-primary" ui-sref="create_product"><span class="glyphicon glyphicon-plus"/> New</button>
+  </div>
+  <div class="input-group col-md-4">
+    <input type="text" class="form-control" placeholder="Search for...">
+    <div class="input-group-btn">
+      <a class="btn btn-default" type="button"><span class=" glyphicon glyphicon-search"/> </a>
+    </div>
+  </div><!-- /input-group -->
+</div>
+<table class="table table-hover">
+  <thead>
+  <th class="col-md-1">ID</th>
+  <th class="col-md-3">Name</th>
+  <th class="col-md-2">Price</th>
+  <th class="col-md-1">Unit</th>
+  <th>Description</th>
+  <th class="col-md-1">Action</th>
+  </thead>
+
+  <tbody>
+  <tr ng-repeat="product in products">
+    <td ng-bind="product.id"></td>
+    <td ng-bind="product.name"></td>
+    <td ng-bind="utils.formatMoney(product.price)"></td>
+    <td ng-bind="product.unit"></td>
+    <td ng-bind="product.description"></td>
+    <td>
+      <a class="btn btn-sm" ng-click="editProduct(product)"><span class="glyphicon glyphicon-pencil"/></a>
+      <a class="btn btn-sm" ng-click="confirmDeleteProduct(product)"><span class="glyphicon glyphicon-trash"/> </a>
+    </td>
+  </tr>
+  </tbody>
+</table>
+
+<!-- Confirm Delete Modal -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" role="dialog" aria-labelledby="confirmDeleteModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="myModalLabel">Are you sure to delete?</h4>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-4"><b>ID</b></div>
+          <div class="col-md-8" ng-bind="working.product.id"></div>
+        </div>
+        <div class="row">
+          <div class="col-md-4"><b>Product name</b></div>
+          <div class="col-md-8" ng-bind="working.product.name"></div>
+        </div>
+        <div class="row">
+          <div class="col-md-4"><b>Price</b></div>
+          <div class="col-md-8" ng-bind="working.product.price"></div>
+        </div>
+        <div class="row">
+          <div class="col-md-4"><b>Unit</b></div>
+          <div class="col-md-8" ng-bind="working.product.unit"></div>
+        </div>
+        <div class="row">
+          <div class="col-md-4"><b>Description</b></div>
+          <div class="col-md-8" ng-bind="working.product.description"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">No, just kidding</button>
+        <button type="button" class="btn btn-primary" ng-click="deleteProduct(working.product)"
+                ng-bind="working.status" ng-class="{disabled: working.processing}"></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Edit Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="editModalLabel">Let's change something and save</h4>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-4"><b>ID</b></div>
+          <div class="col-md-8" ng-bind="working.product.id"></div>
+        </div>
+        <div class="row">
+          <div class="col-md-4"><b>Product name</b></div>
+          <div class="col-md-8">
+            <input type="text" class="form-control" id="inputName" ng-model='working.product.name'
+                   ng-change="changeProductValue('name', working.product.name)">
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-4"><b>Price</b></div>
+          <div class="col-md-8">
+            <input cleave="inputOptions.numeral" type="text" class="form-control" id="inputPrice"
+                   ng-model='working.product.price'
+                   ng-change="changeProductValue('price', working.product.price)">
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-4"><b>Unit</b></div>
+          <div class="col-md-8">
+            <input type="text" class="form-control" id="inputUnit"
+                   ng-model='working.product.unit'
+                   ng-change="changeProductValue('unit', working.product.unit)">
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-4"><b>Description</b></div>
+          <div class="col-md-8">
+            <textarea id="inputDescription" class="form-control" rows="3"
+                      ng-model='working.product.description'
+                      ng-change="changeProductValue('description', working.product.description)"></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Don't save</button>
+        <button type="button" class="btn btn-primary" ng-click="updateProduct(working.product)"
+                ng-bind="working.status" ng-class="{disabled: working.processing}"></button>
+      </div>
+    </div>
+  </div>
+</div>
